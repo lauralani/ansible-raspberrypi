@@ -1,0 +1,32 @@
+- name: Set root password
+  user:
+    name: root
+    password: $6$6DHOEfUpPs86$NugUxdv1vExXOWzBR9.FWffCD5rbkJy/xisFAxY5PkhvPKe4q3wibJgLdbr0hA9HZTtOq.2M6BXzqSqCOos0d1
+  become: yes
+
+- name: copy sshd_config
+  ansible.builtin.copy:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  register: sshconfig
+
+- name: restart ssh service
+  ansible.builtin.service:
+    name: ssh
+    state: restarted
+  become: yes
+  when: sshconfig.changed
+
+- name: Set up ssh authorized keys
+  ansible.posix.authorized_key:
+    user: root
+    state: present
+    key: '{{ item }}'
+  with_file:
+    - sshkeys/desktop
+    - sshkeys/notebook
+  become: yes
