@@ -1,0 +1,25 @@
+- name: Set pi hostname
+  ansible.builtin.hostname:
+    name: {{ hostname }}
+
+- name: copy keyboard defaults
+  ansible.builtin.copy:
+    src: keyboard
+    dest: /etc/default/keyboard
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: install vim git wget curl tcpdump bash-completion
+  ansible.builtin.apt:
+    update_cache: yes
+    pkg:
+    - vim
+    - git
+    - wget
+    - curl
+    - tcpdump
+    - bash-completion
+    state: present
+    cache_valid_time: 360
+    
